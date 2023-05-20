@@ -82,32 +82,22 @@ const AuthForm = () => {
     }
   };
 
-  const socialAction = async (action: SocialLogin) => {
+  const socialAction = (action: SocialLogin) => {
     setIsLoading(true);
 
-    switch (action) {
-      case 'github':
-        signIn(action, { redirect: false })
-          .then((callback) => {
-            if (callback?.error) {
-              toast.error(AuthToasts.InvalidCredentials);
-            }
+    signIn(action, { redirect: false })
+      .then((callback) => {
+        if (callback?.error) {
+          toast.error(AuthToasts.InvalidCredentials);
+        }
 
-            if (callback?.ok && !callback.error) {
-              toast.success(AuthToasts.Success);
-            }
-          })
-          .finally(() => {
-            setIsLoading(false);
-          });
-
-        break;
-      case 'google':
-        // todo
-        break;
-      default:
-        break;
-    }
+        if (callback?.ok && !callback.error) {
+          toast.success(AuthToasts.Success);
+        }
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   return (
