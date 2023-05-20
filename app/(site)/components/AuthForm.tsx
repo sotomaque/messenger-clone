@@ -4,6 +4,8 @@ import Button from '@/app/components/Button';
 import Input from '@/app/components/inputs/Input';
 import { useCallback, useState } from 'react';
 import { type FieldValues, type SubmitHandler, useForm } from 'react-hook-form';
+import AuthSocialButton from './AuthSocialButton';
+import { BsGithub, BsGoogle } from 'react-icons/bs';
 
 // client component -> not server component!
 
@@ -89,9 +91,47 @@ const AuthForm = () => {
             errors={errors}
           />
           <div className="">
-            <Button>Test</Button>
+            {/* submit -> no onclick bc its within a form element */}
+            <Button disabled={isLoading} fullWidth type="submit">
+              {variant === 'LOGIN' ? 'Sign in' : 'Register'}
+            </Button>
           </div>
         </form>
+
+        <div className="mt-6">
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="bg-white px-2 text-gray-500">
+                Or continue with
+              </span>
+            </div>
+          </div>
+
+          <div className="mt-6 flex gap-2">
+            <AuthSocialButton
+              icon={BsGithub}
+              onClick={() => socialAction('github')}
+            />
+            <AuthSocialButton
+              icon={BsGoogle}
+              onClick={() => socialAction('google')}
+            />
+          </div>
+        </div>
+
+        <div className="flex gap-2 justify-center text-sm mt-6 px-2 text-gray-500">
+          <div>
+            {variant === 'LOGIN'
+              ? 'New to messenger?'
+              : 'Already have an account?'}
+          </div>
+          <div className="underline cursor-pointer" onClick={toggleVariants}>
+            {variant === 'LOGIN' ? 'Create an account' : 'Sign in'}
+          </div>
+        </div>
       </div>
     </div>
   );
