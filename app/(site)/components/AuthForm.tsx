@@ -6,8 +6,19 @@ import { useCallback, useState } from 'react';
 import { type FieldValues, type SubmitHandler, useForm } from 'react-hook-form';
 import AuthSocialButton from './AuthSocialButton';
 import { BsGithub, BsGoogle } from 'react-icons/bs';
+import { toast } from 'react-hot-toast';
+import { registerService, signInService } from '@/app/services/authService';
+import { signIn } from 'next-auth/react';
 
 type Variant = 'LOGIN' | 'REGISTER';
+
+enum AuthToasts {
+  GenericError = 'Something went wrong!',
+  InvalidCredentials = 'Invalid credentials!',
+  Success = 'Success!',
+}
+
+export type SocialLogin = 'google' | 'github';
 
 const AuthForm = () => {
   // State
@@ -40,29 +51,63 @@ const AuthForm = () => {
     },
   });
 
-  const onSubmit: SubmitHandler<FieldValues> = (data) => {
+  const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     setIsLoading(true);
 
     if (variant === 'REGISTER') {
-      // fetch request (post) /api/register
-      fetch('/api/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      registerService({
+        data,
+        onError: () => {
+          toast.error(AuthToasts.GenericError);
         },
-        body: JSON.stringify(data),
+        onComplete: () => {
+          setIsLoading(false);
+        },
       });
     }
 
     if (variant === 'LOGIN') {
-      // signin
+      signInService({
+        data,
+        onError: () => {
+          toast.error(AuthToasts.InvalidCredentials);
+        },
+        onSuccess: () => {
+          toast.success(AuthToasts.Success);
+        },
+        onComplete: () => {
+          setIsLoading(false);
+        },
+      });
     }
   };
 
-  const socialAction = (action: string) => {
+  const socialAction = async (action: SocialLogin) => {
     setIsLoading(true);
 
-    // next auth social signin
+    switch (action) {
+      case 'github':
+        signIn(action, { redirect: false })
+          .then((callback) => {
+            if (callback?.error) {
+              toast.error(AuthToasts.InvalidCredentials);
+            }
+
+            if (callback?.ok && !callback.error) {
+              toast.success(AuthToasts.Success);
+            }
+          })
+          .finally(() => {
+            setIsLoading(false);
+          });
+
+        break;
+      case 'google':
+        // todo
+        break;
+      default:
+        break;
+    }
   };
 
   return (

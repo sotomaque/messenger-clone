@@ -11,6 +11,7 @@ enum Errors {
   RegistrationError = 'Registration error',
 }
 
+// need named export bc of app directory
 export async function POST(request: Request) {
   if (request.method !== 'POST') {
     return new NextResponse(Response.InvalidRequest, { status: 405 }); // Return a 405 Method Not Allowed status if the method is not POST
