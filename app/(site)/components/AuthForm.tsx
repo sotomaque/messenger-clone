@@ -7,22 +7,27 @@ import { type FieldValues, type SubmitHandler, useForm } from 'react-hook-form';
 import AuthSocialButton from './AuthSocialButton';
 import { BsGithub, BsGoogle } from 'react-icons/bs';
 
-// client component -> not server component!
-
 type Variant = 'LOGIN' | 'REGISTER';
 
 const AuthForm = () => {
+  // State
   const [variant, setVariant] = useState<Variant>('LOGIN');
   const [isLoading, setIsLoading] = useState(false);
 
+  // Function(s)
   const toggleVariants = useCallback(() => {
+    if (isLoading) {
+      setIsLoading(false);
+    }
+
     if (variant === 'LOGIN') {
       setVariant('REGISTER');
     } else {
       setVariant('LOGIN');
     }
-  }, [variant]);
+  }, [isLoading, variant]);
 
+  // Hook(s)
   const {
     register,
     handleSubmit,
@@ -39,7 +44,14 @@ const AuthForm = () => {
     setIsLoading(true);
 
     if (variant === 'REGISTER') {
-      // axios register
+      // fetch request (post) /api/register
+      fetch('/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
     }
 
     if (variant === 'LOGIN') {
@@ -94,7 +106,7 @@ const AuthForm = () => {
           />
           <div className="">
             {/* submit -> no onclick bc its within a form element */}
-            <Button disabled={isLoading} fullWidth type="submit">
+            <Button fullWidth type="submit">
               {variant === 'LOGIN' ? 'Sign in' : 'Register'}
             </Button>
           </div>
