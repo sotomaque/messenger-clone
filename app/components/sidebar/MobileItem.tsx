@@ -49,6 +49,7 @@ const MobileItem: React.FC<MobileItemProps> = ({
       href={href}
     >
       <Icon className="h-6 w-6" />
+      <span className="sr-only">{label}</span>
     </Link>
   );
 };
