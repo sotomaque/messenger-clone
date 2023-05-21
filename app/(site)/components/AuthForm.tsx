@@ -2,13 +2,14 @@
 
 import Button from '@/app/components/Button';
 import Input from '@/app/components/inputs/Input';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { type FieldValues, type SubmitHandler, useForm } from 'react-hook-form';
 import AuthSocialButton from './AuthSocialButton';
 import { BsGithub, BsGoogle } from 'react-icons/bs';
 import { toast } from 'react-hot-toast';
 import { registerService, signInService } from '@/app/services/authService';
-import { signIn } from 'next-auth/react';
+import { signIn, useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 type Variant = 'LOGIN' | 'REGISTER';
 
@@ -25,6 +26,28 @@ const AuthForm = () => {
   const [variant, setVariant] = useState<Variant>('LOGIN');
   const [isLoading, setIsLoading] = useState(false);
 
+  // Hook(s)
+  const router = useRouter();
+  const session = useSession();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FieldValues>({
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+    },
+  });
+
+  // Effect(s)
+  useEffect(() => {
+    if (session?.status === 'authenticated') {
+      router.replace('/users');
+    }
+  }, [router, session]);
+
   // Function(s)
   const toggleVariants = useCallback(() => {
     if (isLoading) {
@@ -38,19 +61,6 @@ const AuthForm = () => {
     }
   }, [isLoading, variant]);
 
-  // Hook(s)
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<FieldValues>({
-    defaultValues: {
-      name: '',
-      email: '',
-      password: '',
-    },
-  });
-
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     setIsLoading(true);
 
@@ -63,6 +73,9 @@ const AuthForm = () => {
         onComplete: () => {
           setIsLoading(false);
         },
+        onSuccess: () => {
+          signIn('credentials', data);
+        },
       });
     }
 
@@ -74,6 +87,7 @@ const AuthForm = () => {
         },
         onSuccess: () => {
           toast.success(AuthToasts.Success);
+          router.replace('/users');
         },
         onComplete: () => {
           setIsLoading(false);
@@ -93,6 +107,7 @@ const AuthForm = () => {
 
         if (callback?.ok && !callback.error) {
           toast.success(AuthToasts.Success);
+          router.replace('/users');
         }
       })
       .finally(() => {
