@@ -3,13 +3,12 @@
 import { useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import format from 'date-fns/format';
 import clsx from 'clsx';
+import format from 'date-fns/format';
 
-import type { Conversation, Message, User } from '@prisma/client';
+import Avatar from '@/app/components/Avatar';
 import type { FullConversationType } from '@/app/types';
 import useOtherUser from '@/app/hooks/useOtherUser';
-import Avatar from '@/app/components/Avatar';
 
 interface ConvserationItemProps {
   conversation: FullConversationType;

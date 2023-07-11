@@ -16,3 +16,4 @@ pnpm dev
 -- Pusher (Notifications)
 -- NextAuth (Authentication)
 -- Vercel (Deployment)
+-- Cloudinary (images)
